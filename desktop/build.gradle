@@ -1,9 +1,17 @@
 sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = [ "src/" ]
-sourceSets.main.resources.srcDirs = ["../android/assets"]
-
+sourceSets.main.resources.srcDirs = ["res"]
 project.ext.mainClassName = "com.mygdx.game.desktop.DesktopLauncher"
-project.ext.assetsDir = new File("../android/assets")
+project.ext.assetsDir = new File("res")
+
+repositories {
+    flatDir{ dirs  '../libDeskTop'}
+}
+
+dependencies {
+    api files ('../libDeskTop/gdx-backend-lwjgl3-1.9.14.jar')
+    api files ('../libDeskTop/gdx-freetype-platform-1.9.14-natives-desktop.jar')
+}
 
 task run(dependsOn: classes, type: JavaExec) {
     main = project.mainClassName

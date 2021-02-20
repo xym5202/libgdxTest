@@ -1,14 +1,13 @@
-package drop;
+package Screen;
 
-import Screen.MainMenuScreen;
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -16,34 +15,32 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
+import drop.Drop;
+import drop.Drop1;
 
 import java.util.Iterator;
 
-public class Drop extends ApplicationAdapter {
-    private Texture dropImage;
-    private Texture bucketImage;
+public class GameScreen implements Screen {
 
-    private Sound dropSound;
-    private Music rainMusic;
+    final Drop1 game;
+
+     Texture dropImage;
+     Texture bucketImage;
+
+     Sound dropSound;
+     Music rainMusic;
     //相机
-    private OrthographicCamera camera;
-    //绘制2D图像，例如加载纹理
-    private SpriteBatch batch;
-
+     OrthographicCamera camera;
     //用于存储桶位置和大小
-    private Rectangle bucket;
+     Rectangle bucket;
     //存储雨滴的位置，用数组 Array取代ArrayList等java集合，并整合了垃圾回收器
-    private Array<Rectangle> raindrops;
+     Array<Rectangle> raindrops;
     //追踪上次余地生成时间
-    private long lastDropTime;
+     long lastDropTime;
+     int dropsGathered;
 
-
-
-    /**
-     * 初始化
-     */
-    @Override
-    public void create() {
+    public GameScreen(Drop1 game) {
+        this.game = game;
         //加载雨滴和水桶的图片
         dropImage = new Texture(Gdx.files.internal("drop.png"));
         bucketImage = new Texture(Gdx.files.internal("bucket.png"));
@@ -59,9 +56,6 @@ public class Drop extends ApplicationAdapter {
         //确保相机始终向我们展示800*480单位宽的区域
         camera.setToOrtho(false, 800, 480);
 
-        batch = new SpriteBatch();
-
-
         //绘图原点位于屏幕左下角
         bucket = new Rectangle();
         //bucket的初始横坐标位于中间位置
@@ -76,12 +70,23 @@ public class Drop extends ApplicationAdapter {
         spawnRaindrop();
     }
 
-    /**
-     * 渲染
-     */
+    private void spawnRaindrop(){
+        Rectangle raindrop=new Rectangle();
+        raindrop.x = MathUtils.random(0,800-64);
+        raindrop.y=480;
+        raindrop.width=64;
+        raindrop.height=64;
+        raindrops.add(raindrop);
+        lastDropTime = TimeUtils.nanoTime();
+    }
+
     @Override
-    public void render() {
-        super.render();
+    public void show() {
+       // rainMusic.play();
+    }
+
+    @Override
+    public void render(float delta) {
         //深蓝色clear屏幕
         //参数 红 绿 蓝 alpha
         ScreenUtils.clear(0, 0, 0.2f, 1);
@@ -90,14 +95,14 @@ public class Drop extends ApplicationAdapter {
 
         //渲染存储桶
         //告诉spritebatch使用相机指定的坐标系 camera.combined 为相机的投影矩阵
-        batch.setProjectionMatrix(camera.combined);
-        batch.begin();
+        game.batch.setProjectionMatrix(camera.combined);
+        game.batch.begin();
         //绘制水桶 begin和end间可以一次性绘制所有图像
-        batch.draw(bucketImage, bucket.x, bucket.y);
+        game.batch.draw(bucketImage, bucket.x, bucket.y);
         for (Rectangle rectangle :raindrops){
-            batch.draw(dropImage,rectangle.x,rectangle.y);
+            game.batch.draw(dropImage,rectangle.x,rectangle.y);
         }
-        batch.end();
+        game.batch.end();
 
         //添加用户控制水桶
         //首先通过调用询问鼠标模块当前是否有操作
@@ -123,43 +128,45 @@ public class Drop extends ApplicationAdapter {
         //添加雨滴,每个n秒生曾雨滴
         if (TimeUtils.nanoTime()-lastDropTime>1000000000)spawnRaindrop();
         //雨滴行动，200像素每秒恒定速度移动，移除屏幕边缘删除
-        for (Iterator<Rectangle> iterator=raindrops.iterator(); iterator.hasNext();){
+        for (Iterator<Rectangle> iterator = raindrops.iterator(); iterator.hasNext();){
             Rectangle raindrop=iterator.next();
             raindrop.y -=200*Gdx.graphics.getDeltaTime();
             if (raindrop.y +64<0)iterator.remove();
             //雨滴落到桶里就消失
             //overlaps 方法判断两个矩阵是否重叠
             if (raindrop.overlaps(bucket)){
-            //    dropSound.play();
+                dropsGathered++;
+                //    dropSound.play();
                 iterator.remove();
             }
         }
     }
 
-    /**
-     * 在屏幕顶部生成雨滴
-     */
-    private void spawnRaindrop(){
-        Rectangle raindrop=new Rectangle();
-        raindrop.x = MathUtils.random(0,800-64);
-        raindrop.y=480;
-        raindrop.width=64;
-        raindrop.height=64;
-        raindrops.add(raindrop);
-        lastDropTime = TimeUtils.nanoTime();
+    @Override
+    public void resize(int width, int height) {
+
     }
 
-    /**
-     * 关闭时处理资源
-     */
     @Override
-    public  void  dispose(){
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
+    }
+
+    @Override
+    public void hide() {
+
+    }
+
+    @Override
+    public void dispose() {
         dropImage.dispose();
         bucketImage.dispose();
-       // dropSound.dispose();
+        dropSound.dispose();
         rainMusic.dispose();
-        batch.dispose();
     }
-
-
 }
