@@ -17,12 +17,20 @@ public class TestActor extends Actor {
 
     private TextureRegion[] walkX;
     private Texture walkSheetTexture;
-    private TextureRegion stopTextureRegion;
+    private TextureRegion currentFrame;
+    private TextureRegion stopFrame;
 
+    private boolean stop;
     private boolean leftMove;
     private boolean rightMove;
 
-    private TextureRegion currentFrame;
+    private float stateTime;
+
+    private boolean faceToX = true;
+
+    public Texture getWalkSheetTexture() {
+        return walkSheetTexture;
+    }
 
     public Animation getWalkAnimation() {
         return walkAnimation;
@@ -32,20 +40,37 @@ public class TestActor extends Actor {
         return leftMove;
     }
 
+    public boolean isStop() {
+        return stop;
+    }
+
+    public void setStop(boolean stop) {
+        this.stop = stop;
+    }
+
     public void setLeftMove(boolean leftMove) {
-        if (rightMove&&leftMove){
-            rightMove=false;
+        if (rightMove && leftMove) {
+            rightMove = false;
         }
         this.leftMove = leftMove;
+    }
+
+    public boolean isFaceToX() {
+        return faceToX;
+    }
+
+    public void setFaceToX(boolean faceToX) {
+        this.faceToX = faceToX;
     }
 
     public boolean isRightMove() {
         return rightMove;
     }
 
+
     public void setRightMove(boolean rightMove) {
-        if(leftMove&&rightMove){
-            leftMove=false;
+        if (leftMove && rightMove) {
+            leftMove = false;
         }
         this.rightMove = rightMove;
     }
@@ -64,18 +89,22 @@ public class TestActor extends Actor {
         walkX = new TextureRegion[frameRows * frameClo];
 
         int index = 0;
+
         if (index == 0) {
             for (int i = 0; i < frameRows; i++) {
                 for (int j = 0; j < frameClo; j++) {
-                    walkX[index++] = cellRegions[i][j];
+                    TextureRegion cellregion = cellRegions[i][j];
+                    walkX[index++] = cellregion;
                 }
             }
         }
 
         walkAnimation = new Animation(0.05f, walkX);
         walkAnimation.setPlayMode(Animation.PlayMode.LOOP);
-        stopTextureRegion=cellRegions[0][0];
-        setSize(stopTextureRegion.getRegionWidth(), stopTextureRegion.getRegionHeight());
+
+        currentFrame = cellRegions[0][0];
+        stopFrame = cellRegions[0][0];
+        setSize(currentFrame.getRegionWidth(), currentFrame.getRegionHeight());
 
         actorRectangle = new Rectangle();
         actorRectangle.y = 20;
@@ -83,7 +112,7 @@ public class TestActor extends Actor {
 
 
     public TextureRegion getRegion() {
-        return stopTextureRegion;
+        return currentFrame;
     }
 
     @Override
@@ -91,24 +120,38 @@ public class TestActor extends Actor {
 
         super.draw(batch, parentAlpha);
 
-        if (stopTextureRegion == null || !isVisible()) {
+        if (currentFrame == null || !isVisible()) {
             return;
         }
 
-        batch.draw(stopTextureRegion, getX(), getY(), getOriginX(), getOriginY(),
-                getWidth(), getHeight(), getScaleX(), getScaleY(), getRotation());
+        if (stop && faceToX) {
+            batch.draw(stopFrame, faceToX ? actorRectangle.x + getWidth() : actorRectangle.x, actorRectangle.y, faceToX ? -getWidth() : getWidth(), getHeight());
+        } else if (stop && !faceToX) {
+            batch.draw(stopFrame, faceToX ? actorRectangle.x + getWidth() : actorRectangle.x, actorRectangle.y, faceToX ? -getWidth() : getWidth(), getHeight());
+        }else {
+            batch.draw(currentFrame, faceToX ? actorRectangle.x + getWidth() : actorRectangle.x, actorRectangle.y, faceToX ? -getWidth() : getWidth(), getHeight());
+        }
+
     }
 
-
-    public void move(){
-        if (leftMove){
-            actorRectangle.x -=200*Gdx.graphics.getDeltaTime();
-        }
-        if (rightMove){
-            actorRectangle.x +=200*Gdx.graphics.getDeltaTime();
-        }
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+        move();
     }
 
+    public void move() {
+        if (leftMove) {
+            actorRectangle.x -= 20 * Gdx.graphics.getDeltaTime();
+            stateTime += Gdx.graphics.getDeltaTime();
+            currentFrame = (TextureRegion) walkAnimation.getKeyFrame(stateTime);
+        }
+        if (rightMove) {
+            actorRectangle.x += 20 * Gdx.graphics.getDeltaTime();
+            stateTime += Gdx.graphics.getDeltaTime();
+            currentFrame = (TextureRegion) walkAnimation.getKeyFrame(stateTime);
+        }
+    }
 
 
 }

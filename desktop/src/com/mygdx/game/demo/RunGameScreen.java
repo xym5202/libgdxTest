@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -15,18 +15,20 @@ public class RunGameScreen implements Screen {
 
     private TestActor testActor;
     private Stage stage;
+    //相机
+    OrthographicCamera camera;
 
-    private TextureRegion currentFrame;
-
-    private float stateTime;
 
     public RunGameScreen(RunGame runGame) {
         this.runGame = runGame;
         testActor = new TestActor();
         testActor.setPosition(800 / 2, testActor.getHeight() / 2);
+        camera=new OrthographicCamera();
+        camera.setToOrtho(false, 800, 480);
         stage = new Stage();
         stage.addActor(testActor);
         Gdx.input.setInputProcessor(stage);
+        stage.addListener(new TestInputListener());
         testActor.addListener(new TestInputListener());
     }
 
@@ -37,10 +39,14 @@ public class RunGameScreen implements Screen {
         public boolean keyDown(InputEvent event, int keycode) {
             switch (keycode) {
                 case Input.Keys.A:
+                    testActor.setStop(false);
                     testActor.setLeftMove(true);
+                    testActor.setFaceToX(true);
                     break;
                 case Input.Keys.D:
+                    testActor.setStop(false);
                     testActor.setRightMove(true);
+                    testActor.setFaceToX(false);
                     break;
             }
             return true;
@@ -51,9 +57,11 @@ public class RunGameScreen implements Screen {
             switch (keycode) {
                 case Input.Keys.A:
                     testActor.setLeftMove(false);
+                    testActor.setStop(true);
                     break;
                 case Input.Keys.D:
                     testActor.setRightMove(false);
+                    testActor.setStop(true);
                     break;
             }
             return true;
@@ -70,7 +78,6 @@ public class RunGameScreen implements Screen {
         // 黑色清屏
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
         stage.act();
         stage.draw();
 
@@ -100,6 +107,9 @@ public class RunGameScreen implements Screen {
     public void dispose() {
         if (stage != null) {
             stage.dispose();
+        }
+        if (testActor.getWalkSheetTexture()!=null){
+            testActor.getWalkSheetTexture().dispose();
         }
     }
 }

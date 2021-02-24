@@ -7,8 +7,6 @@ public class RunGame extends Game {
 
     public SpriteBatch batch;
 
-    private RunGameScreen runGameScreen;
-
 
     @Override
     public void create() {
