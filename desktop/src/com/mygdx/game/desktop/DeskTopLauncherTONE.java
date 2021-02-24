@@ -11,7 +11,6 @@ public class DeskTopLauncherTONE {
         config.title="Drop";
         config.height=480;
         config.width=800;
-        //设置窗口大小不可变
         config.resizable=false;
         new LwjglApplication(new Drop1(), config);
     }
