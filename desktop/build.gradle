@@ -8,10 +8,10 @@ repositories {
     flatDir{ dirs  '../libDeskTop'}
 }
 
-dependencies {
-    api files ('../libDeskTop/gdx-backend-lwjgl3-1.9.14.jar')
-    api files ('../libDeskTop/gdx-freetype-platform-1.9.14-natives-desktop.jar')
-}
+//dependencies {
+//    api files ('../libDeskTop/gdx-backend-lwjgl3-1.9.14.jar')
+//    api files ('../libDeskTop/gdx-freetype-platform-1.9.14-natives-desktop.jar')
+//}
 
 task run(dependsOn: classes, type: JavaExec) {
     main = project.mainClassName

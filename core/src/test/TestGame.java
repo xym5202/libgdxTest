@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.tiled.renderers.OrthoCachedTiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
@@ -22,6 +24,8 @@ public class TestGame extends Game {
     private OrthographicCamera camera;
     //绘制2D图像，例如加载纹理
     private SpriteBatch batch;
+
+    private OrthogonalTiledMapRenderer renderer;
 
     public OrthographicCamera getCamera() {
         return camera;
@@ -39,6 +43,14 @@ public class TestGame extends Game {
         this.batch = batch;
     }
 
+    public OrthogonalTiledMapRenderer getRenderer() {
+        return renderer;
+    }
+
+    public void setRenderer(OrthogonalTiledMapRenderer renderer) {
+        this.renderer = renderer;
+    }
+
     /**
      * 初始化
      */
@@ -49,7 +61,7 @@ public class TestGame extends Game {
         camera = new OrthographicCamera();
         //确保相机始终向我们展示800*480单位宽的区域
         camera.setToOrtho(false, 800, 480);
-
+        camera.position.set(800/2,480/2,0);
         batch = new SpriteBatch();
         this.setScreen(new MoveScreen(this));
 
@@ -59,8 +71,9 @@ public class TestGame extends Game {
      * 关闭时处理资源
      */
     @Override
-    public  void  dispose(){
+    public void dispose() {
         batch.dispose();
+        renderer.dispose();
     }
 
 

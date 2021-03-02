@@ -17,7 +17,6 @@ public class KeyBordControlArcherActor extends ArcherActor {
 
     private int speed;
     private float stateTime;
-    float stateTime1;
     private TextureRegion currentFrame;
 
     public KeyBordControlArcherActor(TestGame testGame) {

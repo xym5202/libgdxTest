@@ -10,15 +10,6 @@ import com.badlogic.gdx.utils.Array;
 public class ArcherAnimations {
 
 
-//    private Array<TextureAtlas.AtlasRegion> archerRegionMoveUp;
-//    private Array<TextureAtlas.AtlasRegion> archerRegionMoveLeft;
-//    private Array<TextureAtlas.AtlasRegion> archerRegionMoveDown;
-//    private Array<TextureAtlas.AtlasRegion> archerRegionMoveRight;
-//    private Array<TextureAtlas.AtlasRegion> archerRegionMoveRightUp;
-//    private Array<TextureAtlas.AtlasRegion> archerRegionMoveRightDown;
-//    private Array<TextureAtlas.AtlasRegion> archerRegionMoveLeftUp;
-//    private Array<TextureAtlas.AtlasRegion> archerRegionMoveLeftDown;
-
     private Animation archerMoveUpAnimation;
     private Animation archerMoveLeftAnimation;
     private Animation archerMoveDownAnimation;
@@ -33,6 +24,8 @@ public class ArcherAnimations {
     private TextureAtlas atlas;
 
     private static ArcherAnimations instance;
+
+
 
     public static ArcherAnimations getInstance(){
         if (instance==null){
